@@ -4,3 +4,9 @@ Here is the <a href="https://www.researchgate.net/publication/225392029_A_powerf
 
 
 Inspired by Bees searching for food, ABC algorithm is a powerful optimisation algorithm for problems of the form: x = argmin_x{f(x)}, where x is a vector.
+
+<img src="Ackley.png" width="350"/>
+<img src="Greiwank.png" width="350"/>
+<img src="Rastrigin.png" width="350"/>
+<img src="Rosenbrock.png" width="350"/>
+<img src="Schwefel.png" width="350"/>
