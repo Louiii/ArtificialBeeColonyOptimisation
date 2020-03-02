@@ -15,6 +15,7 @@ def plot(problem, bound, best, name, n=30):
 
     fig = plt.figure()
     ax = plt.axes(projection='3d')
+    ax.view_init(20, 15)
 
     [xo, yo], zo = list(best.loc), best.cost
     ax.scatter(xo, yo, zo, color='red', s=10)
@@ -49,10 +50,6 @@ def ABC(fn, d, bound, param):
 
     C = np.zeros(n)
 
-    employed = np.zeros((n_iter, n, d))
-    onlooker = np.zeros((n_iter, n, d))
-    scout = np.zeros((n_iter, n, d))
-
     for it in range(n_iter):
         # Employed bees; place on the food sources in the memory
         # -> measure nectar amounts
@@ -71,7 +68,6 @@ def ABC(fn, d, bound, param):
                 bee[i] = newbee
             else:
                 C[i] += 1
-            employed[it,i] = bee[i].loc
         
         # Onlooker bees; place on the food sources in the memory
         # -> select the food sources
@@ -83,23 +79,22 @@ def ABC(fn, d, bound, param):
                 fit[i] = 1+abs(bee[i].cost)
         P = fit/sum(fit)
         
-        for j in range(n):
-            i = np.random.choice(range(len(P)), p=P)
-            K = list(range(i-1))+list(range(i, n))
+        for i in range(n):
+            j = np.random.choice(range(len(P)), p=P)
+            K = list(range(j-1))+list(range(j, n))
             k = K[np.random.randint(len(K))]
             
             phi = a*np.random.uniform(-1,1,d)
             
             newbee = Bee()
-            newbee.loc = bee[i].loc + np.multiply(phi, (bee[i].loc - bee[k].loc))
+            newbee.loc = bee[j].loc + np.multiply(phi, (bee[j].loc - bee[k].loc))
             newbee.loc = np.minimum(np.maximum(newbee.loc, xmin), xmax)
             newbee.cost = fn(newbee.loc)
             
-            if newbee.cost < bee[j].cost:
-                bee[j] = newbee
+            if newbee.cost < bee[i].cost:
+                bee[i] = newbee
             else:
-                C[j] += 1
-            onlooker[it,j] = bee[j].loc
+                C[i] += 1
         
         # Scout bees; send to the search area for discovering new food sources
         # -> determine the scout bees -> send to possible food sources
@@ -108,7 +103,6 @@ def ABC(fn, d, bound, param):
                 bee[i].loc = np.random.uniform(low=xmin, high=xmax, size=d)
                 bee[i].cost = fn(bee[i].loc)
                 C[i] = 0
-            scout[it,i] = bee[i].loc
         
         for i in range(n):
             if bee[i].cost < best.cost:
